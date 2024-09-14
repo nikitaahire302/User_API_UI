@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { API_URL } from './utils/constants';
 import axios from 'axios';
+import cors from 'cors';
+
 
 const App = () => {
     const [users, setUsers] = useState([]);
@@ -19,16 +21,24 @@ const App = () => {
 
     // Replace with your actual API calls
     const getUsers = async () => {
-        // Example API call
-        const res = await axios.get(API_URL);
-        setUsers(res.data.data);
+        try {
+            const res = await axios.get(API_URL);
+            console.log("Fetched users:", res.data);
+            setUsers(res.data.data); // Adjust based on the structure of the response
+        } catch (error) {
+            console.error("Error fetching users:", error.response ? error.response.data : error.message);
+        }
     };
-
+    
     const getUserById = async () => {
-        // Example API call
-        const res = await axios.get(`${API_URL}/${userId}`);
-        setUserData(res.data);
+        try {
+            const res = await axios.get(`${API_URL}/${userId}`);
+            setUserData(res.data);
+        } catch (error) {
+            console.error("Error fetching user by ID:", error.response ? error.response.data : error.message);
+        }
     };
+    
 
     const postUser = async () => {
         // Example API call
@@ -84,6 +94,11 @@ const App = () => {
 
     // DELETE Request - Delete user
     const deleteUser = async () => {
+        if (!userId) {
+            setResponse('User ID is required');
+            return;
+        }
+        
         try {
             await axios.delete(`${API_URL}/${userId}`, {
                 headers: {
@@ -94,10 +109,11 @@ const App = () => {
             setUserId('');
             setAppId('');
         } catch (error) {
-            console.error(error);
+            console.error("Error deleting user:", error.response ? error.response.data : error.message);
             setResponse('Error deleting user');
         }
     };
+    
 
     return (
         <div className="min-h-screen bg-gray-100 p-8">
